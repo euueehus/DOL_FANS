@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Degrees of Lewdity</title>
+    <link rel="stylesheet" href="css/ui.css" />
+</head>
+
+<body>
+    <div id="ui-bar">
+        <div id="ui-bar-tray">
+            <button type="button" id="ui-bar-toggle" title="收合側欄" aria-label="收合側欄"></button>
+        </div>
+
+        <div id="ui-bar-body">
+            <div id="story-title">Degrees of Lewdity</div>
+            <div id="player-name">主角</div>
+
+            <div class="caption-block">
+                <div class="stat" id="stat-time">
+                    <div class="stat-head">
+                        <span class="gold">時間</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                </div>
+                <div class="stat" id="stat-location">
+                    <div class="stat-head">
+                        <span class="gold">地點</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                </div>
+
+                <div class="stat" id="stat-money">
+                    <div class="stat-head">
+                        <span class="gold">金錢</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                </div>
+            </div>
+
+            <div id="portrait-slot">
+                <img id="portrait" src="html_img/start.jpg" alt="" />
+            </div>
+
+            <div id="stats">
+                <div class="stat meter" id="stat-stamina" data-invert="0">
+                    <div class="stat-head">
+                        <span>體力</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                    <div class="stat-bar"><i data-value="0"></i></div>
+                </div>
+                <div class="stat meter" id="stat-fatigue" data-invert="1">
+                    <div class="stat-head">
+                        <span>疲勞</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                    <div class="stat-bar"><i data-value="0"></i></div>
+                </div>
+                <div class="stat meter" id="stat-stress" data-invert="1">
+                    <div class="stat-head">
+                        <span>壓力</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                    <div class="stat-bar"><i data-value="0"></i></div>
+                </div>
+                <div class="stat meter" id="stat-injury" data-invert="1">
+                    <div class="stat-head">
+                        <span>傷勢</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                    <div class="stat-bar"><i data-value="0"></i></div>
+                </div>
+                <div class="stat meter" id="stat-will" data-invert="0">
+                    <div class="stat-head">
+                        <span>意志</span>
+                        <span data-field="value">—</span>
+                    </div>
+                    <div class="stat-note" data-field="note"></div>
+                    <div class="stat-bar"><i data-value="0"></i></div>
+                </div>
+            </div>
+
+            <nav id="menu">
+                <ul>
+                    <li><a href="#" data-cmd="save">存檔</a></li>
+                    <li><a href="#" data-cmd="load">讀檔</a></li>
+                    <li><a href="#" data-cmd="settings">設定</a></li>
+                    <li><a href="#" data-cmd="title">標題</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div id="story">
+        <div id="passages">
+            <div id="passage-text">
+                <p>等待遊戲狀態…</p>
+            </div>
+            <ul id="action-list"></ul>
+        </div>
+    </div>
+
+    <script src="js/ui.js"></script>
+</body>
+
+</html>

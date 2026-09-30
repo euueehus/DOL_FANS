@@ -12,5 +12,23 @@
     <PackageReference Include="JsonFucker" Version="1.6.7" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
   </ItemGroup>
-
+<ItemGroup>
+  <None Update="ui.html">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+  <ItemGroup>
+    <None Update="ui.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="css\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="js\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="html_img\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
