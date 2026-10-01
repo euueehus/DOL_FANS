@@ -23,31 +23,64 @@ namespace DOL
 
         }
 
+        private string _playerName = "主角";
+        private string _portrait = "html_img/cyrene.jpg";
+
+        private void Go(string file)
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, file);
+            webView21.CoreWebView2.Navigate(new Uri(path).AbsoluteUri);
+        }
+
         private async void OnWebMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             using var doc = JsonDocument.Parse(e.WebMessageAsJson);
             var root = doc.RootElement;
             var type = root.GetProperty("type").GetString();
 
-            if (type == "start")
+            switch (type)
             {
-                var game = Path.Combine(AppContext.BaseDirectory, "ui.html");
-                webView21.CoreWebView2.Navigate(new Uri(game).AbsoluteUri);
-                return;
-            }
+                case "nav":
+                    Go(root.GetProperty("page").GetString() switch
+                    {
+                        "create" => "create.html",
+                        "gallery" => "gallery.html",
+                        _ => "start.html"
+                    });
+                    break;
 
-            if (type == "action")
-            {
-                var id = root.GetProperty("id").GetString();
-                _scene = id switch
-                {
-                    "window" => "window",
-                    "dress" => "dress",
-                    "bed" => "wake",
-                    "downstairs" => "dress",
-                    _ => _scene
-                };
-                await PushStateAsync();
+                case "cmd":
+                    Go(root.GetProperty("cmd").GetString() switch
+                    {
+                        "create" => "create.html",
+                        "gallery" => "gallery.html",
+                        _ => "start.html"
+                    });
+                    break;
+
+                case "create":
+                    _playerName = root.GetProperty("playerName").GetString() ?? "主角";
+                    var art = root.GetProperty("portrait").GetString();
+                    _portrait = art == "start" ? "html_img/start.jpg" : "html_img/cyrene.jpg";
+                    Go("ui.html");
+                    break;
+
+                case "start":
+                    Go("ui.html");
+                    break;
+
+                case "action":
+                    var id = root.GetProperty("id").GetString();
+                    _scene = id switch
+                    {
+                        "window" => "window",
+                        "dress" => "dress",
+                        "bed" => "wake",
+                        "downstairs" => "dress",
+                        _ => _scene
+                    };
+                    await PushStateAsync();
+                    break;
             }
         }
         private async Task InitWebView()
