@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Degrees of Lewdity</title>
+    <link rel="stylesheet" href="css/ui.css" />
+    <link rel="stylesheet" href="css/start.css" />
+</head>
+<body class="start-page">
+    <div id="start-wrap">
+        <img id="start-banner" src="html_img/start.jpg" alt="" />
+
+        <p class="warn">
+            本作品為虛構創作。內容包含可能引起部分玩家不適的相關主題。
+        </p>
+
+        <p class="label">請選擇遊戲模式：</p>
+        <div class="row modes">
+            <button type="button" class="mode on" data-mode="basic">基礎</button>
+            <button type="button" class="mode" data-mode="custom">自定義</button>
+            <button type="button" class="mode" data-mode="random">隨機</button>
+        </div>
+
+        <div class="row menus">
+           
+            <button type="button" data-cmd="feats">成就加成 <span class="star">*</span></button>
+            <button type="button" data-cmd="gallery">畫廊</button>
+            <button type="button" data-cmd="io">導出/導入設置</button>
+        </div>
+
+        <div id="mode-help" class="help">
+            <span class="gold">基礎開局：</span>
+            <span class="teal">推薦初學者選擇。</span>
+        </div>
+
+        <p class="gold">存檔名：<span class="muted">（可選）</span></p>
+        <input id="save-name" type="text" maxlength="40" />
+        <p class="hint">存檔之後才會真正寫入。現在先不用填。</p>
+
+        <p class="gold">當前設置：<span class="muted">可調整</span></p>
+        <button type="button" id="btn-start" class="start">(1) 開始遊戲！</button>
+    </div>
+    <script src="js/start.js"></script>
+</body>
+</html>

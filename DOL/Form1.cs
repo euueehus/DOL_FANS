@@ -27,18 +27,28 @@ namespace DOL
         {
             using var doc = JsonDocument.Parse(e.WebMessageAsJson);
             var root = doc.RootElement;
-            if (root.GetProperty("type").GetString() != "action") return;
+            var type = root.GetProperty("type").GetString();
 
-            var id = root.GetProperty("id").GetString();
-            _scene = id switch
+            if (type == "start")
             {
-                "window" => "window",
-                "dress" => "dress",
-                "bed" => "wake",
-                "downstairs" => "dress",
-                _ => _scene
-            };
-            await PushStateAsync();
+                var game = Path.Combine(AppContext.BaseDirectory, "ui.html");
+                webView21.CoreWebView2.Navigate(new Uri(game).AbsoluteUri);
+                return;
+            }
+
+            if (type == "action")
+            {
+                var id = root.GetProperty("id").GetString();
+                _scene = id switch
+                {
+                    "window" => "window",
+                    "dress" => "dress",
+                    "bed" => "wake",
+                    "downstairs" => "dress",
+                    _ => _scene
+                };
+                await PushStateAsync();
+            }
         }
         private async Task InitWebView()
         {
@@ -52,7 +62,7 @@ namespace DOL
                 await PushStateAsync();
             };
 
-            var path = Path.Combine(AppContext.BaseDirectory, "ui.html");
+            var path = Path.Combine(AppContext.BaseDirectory, "start.html");
             webView21.CoreWebView2.Navigate(new Uri(path).AbsoluteUri);
         }
         private string _scene = "wake";
