@@ -1,0 +1,35 @@
+.start-page {
+  background: #111;
+  color: #eee;
+  font: 16px/1.55 "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+#start-wrap { max-width: 920px; margin: 0 auto; padding: 18px 24px 48px; }
+#start-banner {
+  display: block; width: 100%; max-height: 160px;
+  object-fit: cover; object-position: center; margin-bottom: 14px;
+}
+.warn { margin: 0 0 22px; }
+.label { margin: 0 0 8px; }
+.row { display: grid; gap: 10px; margin-bottom: 12px; }
+.modes { grid-template-columns: 1fr 1fr 1fr; }
+.menus { grid-template-columns: 1fr 1fr 1fr 1fr; }
+button {
+  background: #2a2a2a; color: #eee; border: 1px solid #444;
+  padding: 12px 8px; cursor: pointer; font: inherit;
+}
+button:hover { border-color: #eee; }
+.mode.on { outline: 2px solid #e4c158; color: #e4c158; background: #1a1a1a; }
+.star { color: #ec3535; }
+.help { border: 1px solid #444; padding: 12px 14px; margin: 8px 0 22px; }
+.gold { color: #e4c158; }
+.teal { color: #3ad0c8; }
+.muted { color: #888; font-weight: normal; }
+#save-name {
+  display: block; width: 220px; background: #111; color: #eee;
+  border: 1px solid #666; padding: 6px 8px; margin: 6px 0 4px;
+}
+.hint { color: #777; font-size: 13px; margin: 0 0 18px; }
+#btn-start { min-width: 240px; padding: 10px 16px; }
+@media (max-width: 720px) {
+  .modes, .menus { grid-template-columns: 1fr; }
+}
