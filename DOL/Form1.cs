@@ -25,6 +25,7 @@ namespace DOL
 
         private string _playerName = "主角";
         private string _portrait = "html_img/cyrene.jpg";
+        private string _scene = "wake";
 
         private void Go(string file)
         {
@@ -98,7 +99,7 @@ namespace DOL
             var path = Path.Combine(AppContext.BaseDirectory, "start.html");
             webView21.CoreWebView2.Navigate(new Uri(path).AbsoluteUri);
         }
-        private string _scene = "wake";
+       
         //推畫面
         private async Task PushStateAsync()
         {

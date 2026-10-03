@@ -40,11 +40,15 @@
     window.setState = function (s) {
         function setStat(id, value, note, bar) {
             if (s.portrait) {
-  var img = document.getElementById("portrait");
-  if (img) img.src = s.portrait;
-}
+                var img = document.getElementById("portrait");
+                if (img) img.src = s.portrait;
+                if (s.portrait) {
+                    var img = document.getElementById("portrait");
+                    if (img) img.src = s.portrait;
+                }
+            }
             var el = document.getElementById(id);
-            
+
             if (!el) return;
             var valueEl = el.querySelector('[data-field="value"]');
             var noteEl = el.querySelector('[data-field="note"]');

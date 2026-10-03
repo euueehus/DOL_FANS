@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>角色創建</title>
+    <link rel="stylesheet" href="css/ui.css" />
+    <link rel="stylesheet" href="css/start.css" />
+</head>
+
+<body class="start-page">
+    <div id="start-wrap">
+        <p class="gold">角色創建</p>
+
+        <p class="label">名字</p>
+        <input id="player-name" type="text" maxlength="24" value="主角" />
+
+        <p class="label">開局難度</p>
+        <div class="row modes">
+            <button type="button" class="mode on" data-diff="easy">簡單</button>
+            <button type="button" class="mode" data-diff="normal">普通</button>
+            <button type="button" class="mode" data-diff="hard">困難</button>
+        </div>
+
+        <p class="label">側欄立繪</p>
+        <div class="row menus">
+            <button type="button" class="mode on" data-art="cyrene">cyrene</button>
+            <button type="button" class="mode" data-art="start">start</button>
+        </div>
+
+        <div class="help">
+            這裡只決定名字、難度、立繪。劇情與數值仍由 C# 持有。按確認會把選擇送回遊戲，再進入主畫面。
+        </div>
+
+        <button type="button" id="btn-back">返回標題</button>
+        <button type="button" id="btn-ok" class="start">確認並開始</button>
+    </div>
+    <script src="js/create.js"></script>
+</body>
+
+</html>
