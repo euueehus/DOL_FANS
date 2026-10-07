@@ -5,36 +5,71 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>角色創建</title>
-    <link rel="stylesheet" href="css/ui.css" />
     <link rel="stylesheet" href="css/start.css" />
+    <style>
+        .card {
+            border: 1px solid #444;
+            background: #1a1a1a;
+            padding: 14px;
+            margin: 10px 0 16px;
+            text-align: left;
+            color: #eee;
+            width: 100%;
+        }
+
+        .card.on {
+            outline: 2px solid #e4c158;
+        }
+
+        .card h2 {
+            margin: 0 0 6px;
+            color: #e4c158;
+            font-size: 18px;
+        }
+
+        .from {
+            color: #888;
+            font-size: 13px;
+            margin: 0 0 8px;
+        }
+
+        .traits {
+            margin: 8px 0 0;
+            padding-left: 18px;
+        }
+
+        .world {
+            border: 1px solid #444;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            color: #ccc;
+        }
+    </style>
 </head>
 
 <body class="start-page">
     <div id="start-wrap">
-        <p class="gold">角色創建</p>
-
-        <p class="label">名字</p>
-        <input id="player-name" type="text" maxlength="24" value="主角" />
-
-        <p class="label">開局難度</p>
-        <div class="row modes">
-            <button type="button" class="mode on" data-diff="easy">簡單</button>
-            <button type="button" class="mode" data-diff="normal">普通</button>
-            <button type="button" class="mode" data-diff="hard">困難</button>
+        <p class="gold">選擇角色</p>
+        <div class="world">
+            這座城會同時出現開拓、學園都市與賽場的人。現有來源：崩壞：星穹鐵道、蔚藍檔案、賽馬娘。之後還會加。
         </div>
 
-        <p class="label">側欄立繪</p>
-        <div class="row menus">
-            <button type="button" class="mode on" data-art="cyrene">cyrene</button>
-            <button type="button" class="mode" data-art="start">start</button>
-        </div>
+        <button type="button" class="card on" data-id="stelle">
+            <h2>開拓者・星</h2>
+            <p class="from">崩壞：星穹鐵道</p>
+            <p>星核載體。記憶斷過，仍會往前走。打架靠星核與即興，不是精密戰術。</p>
+            <ul class="traits">
+                <li>星核：開局意志較高。</li>
+                <li>無名客：開場多一條「先觀察」。</li>
+                <li>即興：體力中上。</li>
+            </ul>
+        </button>
 
-        <div class="help">
-            這裡只決定名字、難度、立繪。劇情與數值仍由 C# 持有。按確認會把選擇送回遊戲，再進入主畫面。
-        </div>
-
+        <p class="label">玩家怎麼叫她（可改）</p>
+        <input id="player-name" type="text" maxlength="24" value="星" />
+        <p></p>
         <button type="button" id="btn-back">返回標題</button>
-        <button type="button" id="btn-ok" class="start">確認並開始</button>
+        <button type="button" id="btn-ok" class="start">用這個角色開始</button>
     </div>
     <script src="js/create.js"></script>
 </body>

@@ -2,7 +2,7 @@
 using Microsoft.Web.WebView2.Core;
 using System.Text.Json;
 namespace DOL
-    //第一次用webview註解較多
+//第一次用webview註解較多
 {
     public partial class Form1 : Form
     {
@@ -23,15 +23,24 @@ namespace DOL
 
         }
 
-        private string _playerName = "主角";
+        private string _characterId = "stelle";
+        private string _playerName = "星";
         private string _portrait = "html_img/cyrene.jpg";
         private string _scene = "wake";
+        private List<string> _feats = new();
+        private int _money = 184;
+        private int _stamina = 78;
+        private int _stress = 30;
+        private int _injury = 0;
+        private int _will = 88;
 
         private void Go(string file)
         {
             var path = Path.Combine(AppContext.BaseDirectory, file);
             webView21.CoreWebView2.Navigate(new Uri(path).AbsoluteUri);
         }
+
+        private bool _hasCharacter;
 
         private async void OnWebMessage(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
@@ -42,32 +51,49 @@ namespace DOL
             switch (type)
             {
                 case "nav":
-                    Go(root.GetProperty("page").GetString() switch
-                    {
-                        "create" => "create.html",
-                        "gallery" => "gallery.html",
-                        _ => "start.html"
-                    });
-                    break;
-
                 case "cmd":
-                    Go(root.GetProperty("cmd").GetString() switch
+                    var key = type == "nav"
+                        ? root.GetProperty("page").GetString()
+                        : root.GetProperty("cmd").GetString();
+                    Go(key switch
                     {
                         "create" => "create.html",
                         "gallery" => "gallery.html",
+                        "feats" => "feats.html",
+                        "io" or "settings" => "settings.html",
+                        "title" => "start.html",
                         _ => "start.html"
                     });
                     break;
 
                 case "create":
-                    _playerName = root.GetProperty("playerName").GetString() ?? "主角";
-                    var art = root.GetProperty("portrait").GetString();
-                    _portrait = art == "start" ? "html_img/start.jpg" : "html_img/cyrene.jpg";
+                    _characterId = root.TryGetProperty("characterId", out var cid)
+                        ? cid.GetString() ?? "stelle" : "stelle";
+                    _playerName = root.TryGetProperty("playerName", out var pn)
+                        ? pn.GetString() ?? "星" : "星";
+                    _hasCharacter = true;
+                    ApplyCharacter(_characterId);
+                    _scene = "wake";
                     Go("ui.html");
                     break;
 
                 case "start":
+                    if (!_hasCharacter)
+                    {
+                        Go("create.html");
+                        break;
+                    }
+                    _scene = "wake";
                     Go("ui.html");
+                    break;
+
+                case "feats":
+                    _feats = root.GetProperty("ids").EnumerateArray()
+                        .Select(x => x.GetString() ?? "")
+                        .Where(x => x.Length > 0)
+                        .ToList();
+                    if (_hasCharacter) ApplyCharacter(_characterId);
+                    Go("start.html");
                     break;
 
                 case "action":
@@ -78,11 +104,32 @@ namespace DOL
                         "dress" => "dress",
                         "bed" => "wake",
                         "downstairs" => "dress",
+                        "watch" => "watch",
                         _ => _scene
                     };
                     await PushStateAsync();
                     break;
             }
+        }
+        //角色數值要增加就加if
+        private void ApplyCharacter(string id)
+        {
+            if (id == "stelle")
+            {
+                _money = 184;
+                _stamina = 78;
+                _stress = 30;
+                _injury = 0;
+                _will = 88;
+                _portrait = "html_img/cyrene.jpg";
+                return;
+            }
+
+            _money = 100;
+            _stamina = 70;
+            _stress = 40;
+            _injury = 0;
+            _will = 70;
         }
         private async Task InitWebView()
         {
@@ -92,6 +139,13 @@ namespace DOL
 
             webView21.CoreWebView2.NavigationCompleted += async (s, e) =>
             {
+                if (e.IsSuccess && webView21.Source?.AbsolutePath.EndsWith("start.html") == true && _hasCharacter)
+                {
+                    var name = _playerName.Replace("'", "");
+                    await webView21.CoreWebView2.ExecuteScriptAsync($"window.showPicked('{name}')");
+                }
+                if (e.IsSuccess && webView21.Source?.AbsolutePath.EndsWith("ui.html") == true)
+                    await PushStateAsync();
                 if (!e.IsSuccess) return;
                 await PushStateAsync();
             };
@@ -99,7 +153,7 @@ namespace DOL
             var path = Path.Combine(AppContext.BaseDirectory, "start.html");
             webView21.CoreWebView2.Navigate(new Uri(path).AbsoluteUri);
         }
-       
+
         //推畫面
         private async Task PushStateAsync()
         {
@@ -108,28 +162,23 @@ namespace DOL
             //passage 下包都是劇情文字
             if (_scene == "wake")
             {
-                passage = "<p>鬧鐘響了第二次。你還沒決定要不要起床。</p>";
-                actions = new object[]
-                {
-            new { id = "dress",  text = "換上制服下樓", cost = "15分" },
-            new { id = "window", text = "看窗外",       cost = "" },
-                };
+                passage = "<p>你醒在一間不算熟悉的房間。星核還在，記憶卻對不上這座城。</p>";
+                var list = new List<object>
+    {
+        new { id = "dress", text = "先把自己整理好", cost = "15分" },
+        new { id = "window", text = "看窗外", cost = "" },
+    };
+                if (_characterId == "stelle")
+                    list.Add(new { id = "watch", text = "先觀察，不急著出門", cost = "" });
+                actions = list.ToArray();
             }
-            else if (_scene == "window")
+            else if (_scene == "watch")
             {
-                passage = "<p>窗外是還沒亮完的天。樓下已經有人在走了。</p>";
+                passage = "<p>你在門口站了一會。走廊安靜，沒有列車的廣播，也沒有學園的鐘。</p>";
                 actions = new object[]
                 {
-            new { id = "dress", text = "還是去換衣服", cost = "10分" },
-            new { id = "bed",   text = "再躺五分鐘",   cost = "" },
-                };
-            }
-            else if (_scene == "dress")
-            {
-                passage = "<p>你把制服從椅背上拿起來。</p>";
-                actions = new object[]
-                {
-            new { id = "downstairs", text = "下樓", cost = "5分" },
+        new { id = "dress", text = "還是去整理裝備", cost = "10分" },
+        new { id = "window", text = "再看一次窗外", cost = "" },
                 };
             }
             else
@@ -139,17 +188,16 @@ namespace DOL
 
             var state = new
             {
-                playerName = "主角",
+                playerName = _playerName,
+                portrait = _portrait,
                 stats = new Dictionary<string, object>
                 {
-                    ["time"] = new { value = "週五 07:12", note = "天氣：陰", bar = 30 },
-                    ["location"] = new { value = "宿舍房間", note = "", bar = 0 },
-                    ["money"] = new { value = "$184", note = "", bar = 0 },
-                    ["stamina"] = new { value = "72 / 100", note = "", bar = 72 },
-                    ["fatigue"] = new { value = "38 / 100", note = "", bar = 38 },
-                    ["stress"] = new { value = "45 / 100", note = "", bar = 45 },
-                    ["injury"] = new { value = "5 / 100", note = "", bar = 5 },
-                    ["will"] = new { value = "80 / 100", note = "", bar = 80 },
+                    
+                    ["money"] = new { value = "$" + _money, note = "", bar = 0 },
+                    ["stamina"] = new { value = _stamina + " / 100", note = "即興還撐得住", bar = _stamina },
+                    ["stress"] = new { value = _stress + " / 100", note = "", bar = _stress },
+                    ["injury"] = new { value = _injury + " / 100", note = "", bar = _injury },
+                    ["will"] = new { value = _will + " / 100", note = "星核還在", bar = _will },
                 },
                 passage,
                 actions,

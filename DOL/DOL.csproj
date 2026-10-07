@@ -13,6 +13,12 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
   </ItemGroup>
 <ItemGroup>
+  <None Update="create.html">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="gallery.html">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
   <None Update="start.html">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>
