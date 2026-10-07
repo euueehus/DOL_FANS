@@ -6,70 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>角色創建</title>
     <link rel="stylesheet" href="css/start.css" />
-    <style>
-        .card {
-            border: 1px solid #444;
-            background: #1a1a1a;
-            padding: 14px;
-            margin: 10px 0 16px;
-            text-align: left;
-            color: #eee;
-            width: 100%;
-        }
-
-        .card.on {
-            outline: 2px solid #e4c158;
-        }
-
-        .card h2 {
-            margin: 0 0 6px;
-            color: #e4c158;
-            font-size: 18px;
-        }
-
-        .from {
-            color: #888;
-            font-size: 13px;
-            margin: 0 0 8px;
-        }
-
-        .traits {
-            margin: 8px 0 0;
-            padding-left: 18px;
-        }
-
-        .world {
-            border: 1px solid #444;
-            padding: 10px 12px;
-            margin-bottom: 14px;
-            color: #ccc;
-        }
-    </style>
+    <link rel="stylesheet" href="css/create.css" />
 </head>
 
 <body class="start-page">
     <div id="start-wrap">
-        <p class="gold">選擇角色</p>
-        <div class="world">
-            這座城會同時出現開拓、學園都市與賽場的人。現有來源：崩壞：星穹鐵道、蔚藍檔案、賽馬娘。之後還會加。
-        </div>
+        <p class="kicker">CHARACTER</p>
+        <h1>選擇角色</h1>
+        <p class="world">這座城同時有開拓、學園都市與賽場的人。現有來源：崩壞：星穹鐵道、蔚藍檔案、賽馬娘。之後還會加。</p>
 
-        <button type="button" class="card on" data-id="stelle">
-            <h2>開拓者・星</h2>
-            <p class="from">崩壞：星穹鐵道</p>
-            <p>星核載體。記憶斷過，仍會往前走。打架靠星核與即興，不是精密戰術。</p>
-            <ul class="traits">
-                <li>星核：開局意志較高。</li>
-                <li>無名客：開場多一條「先觀察」。</li>
-                <li>即興：體力中上。</li>
-            </ul>
+        <button type="button" class="pick on" data-id="stelle">
+            <img src="html_img/start.jpg" alt="" />
+            <div>
+                <p class="from">崩壞：星穹鐵道</p>
+                <h2>開拓者・星</h2>
+                <p class="blurb">星核載體。記憶斷過，仍會往前走。打架靠星核與即興，不是精密戰術。</p>
+                <div class="chips">
+                    <span>星核　意志 88</span>
+                    <span>無名客　多一條觀察</span>
+                    <span>即興　體力 78</span>
+                </div>
+            </div>
         </button>
 
-        <p class="label">玩家怎麼叫她（可改）</p>
+        <label class="name-row" for="player-name">玩家怎麼叫她</label>
         <input id="player-name" type="text" maxlength="24" value="星" />
-        <p></p>
-        <button type="button" id="btn-back">返回標題</button>
-        <button type="button" id="btn-ok" class="start">用這個角色開始</button>
+
+        <div class="actions">
+            <button type="button" id="btn-back">返回標題</button>
+            <button type="button" id="btn-ok" class="start">用這個角色開始</button>
+        </div>
     </div>
     <script src="js/create.js"></script>
 </body>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <title>導出 / 導入</title>
+    <link rel="stylesheet" href="css/start.css" />
+    <style>
+        textarea {
+            width: 100%;
+            min-height: 160px;
+            background: #111;
+            color: #eee;
+            border: 1px solid #666;
+            padding: 8px;
+            font: 13px/1.4 Consolas, monospace;
+        }
+    </style>
+</head>
+
+<body class="start-page">
+    <div id="start-wrap">
+        <p class="gold">導出 / 導入設置</p>
+        <p class="hint">只帶名字、角色、立繪、成就勾選。不是完整存檔。</p>
+        <textarea id="blob" spellcheck="false"></textarea>
+        <p></p>
+        <button type="button" id="btn-export">導出到文字框</button>
+        <button type="button" id="btn-import">從文字框導入</button>
+        <button type="button" id="btn-back">返回標題</button>
+    </div>
+    <script src="js/settings.js"></script>
+</body>
+
+</html>

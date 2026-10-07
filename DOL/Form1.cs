@@ -38,6 +38,7 @@ namespace DOL
         {
             var path = Path.Combine(AppContext.BaseDirectory, file);
             webView21.CoreWebView2.Navigate(new Uri(path).AbsoluteUri);
+
         }
 
         private bool _hasCharacter;
@@ -95,6 +96,34 @@ namespace DOL
                     if (_hasCharacter) ApplyCharacter(_characterId);
                     Go("start.html");
                     break;
+                case "export":
+                    var json = System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        playerName = _playerName,
+                        characterId = _characterId,
+                        portrait = _portrait,
+                        feats = _feats
+                    });
+                    var escaped = json.Replace("\\", "\\\\").Replace("'", "\\'");
+                    await webView21.CoreWebView2.ExecuteScriptAsync($"window.showExport('{escaped}')");
+                    break;
+
+                case "import":
+                    try
+                    {
+                        using var imported = JsonDocument.Parse(root.GetProperty("text").GetString() ?? "{}");
+                        var box = imported.RootElement;
+                        if (box.TryGetProperty("playerName", out var n)) _playerName = n.GetString() ?? _playerName;
+                        if (box.TryGetProperty("characterId", out var c)) _characterId = c.GetString() ?? _characterId;
+                        if (box.TryGetProperty("portrait", out var p)) _portrait = p.GetString() ?? _portrait;
+                        if (box.TryGetProperty("feats", out var f))
+                            _feats = f.EnumerateArray().Select(x => x.GetString() ?? "").Where(x => x.Length > 0).ToList();
+                        _hasCharacter = true;
+                        ApplyCharacter(_characterId);
+                    }
+                    catch { }
+                    Go("start.html");
+                    break;
 
                 case "action":
                     var id = root.GetProperty("id").GetString();
@@ -121,9 +150,12 @@ namespace DOL
                 _stress = 30;
                 _injury = 0;
                 _will = 88;
-                _portrait = "html_img/cyrene.jpg";
+                _portrait = "html_img/start.jpg";
                 return;
             }
+            if (_feats.Contains("rich")) _money += 200;
+            if (_feats.Contains("tough")) { _stamina = 90; _injury = 0; }
+            if (_feats.Contains("calm")) { _stress = 10; _will = 95; }
 
             _money = 100;
             _stamina = 70;
@@ -139,15 +171,15 @@ namespace DOL
 
             webView21.CoreWebView2.NavigationCompleted += async (s, e) =>
             {
-                if (e.IsSuccess && webView21.Source?.AbsolutePath.EndsWith("start.html") == true && _hasCharacter)
+                if (!e.IsSuccess) return;
+                var path = webView21.Source?.AbsolutePath ?? "";
+                if (path.EndsWith("start.html") && _hasCharacter)
                 {
                     var name = _playerName.Replace("'", "");
                     await webView21.CoreWebView2.ExecuteScriptAsync($"window.showPicked('{name}')");
                 }
-                if (e.IsSuccess && webView21.Source?.AbsolutePath.EndsWith("ui.html") == true)
+                if (path.EndsWith("ui.html"))
                     await PushStateAsync();
-                if (!e.IsSuccess) return;
-                await PushStateAsync();
             };
 
             var path = Path.Combine(AppContext.BaseDirectory, "start.html");
@@ -192,7 +224,7 @@ namespace DOL
                 portrait = _portrait,
                 stats = new Dictionary<string, object>
                 {
-                    
+
                     ["money"] = new { value = "$" + _money, note = "", bar = 0 },
                     ["stamina"] = new { value = _stamina + " / 100", note = "即興還撐得住", bar = _stamina },
                     ["stress"] = new { value = _stress + " / 100", note = "", bar = _stress },

@@ -39,5 +39,10 @@
     <None Update="html_img\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="feats.html"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
+<None Update="settings.html"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
+<None Update="css\create.css"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
+<None Update="js\feats.js"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
+<None Update="js\settings.js"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
   </ItemGroup>
 </Project>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <title>成就加成</title>
+    <link rel="stylesheet" href="css/start.css" />
+    <style>
+        .feat {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            border: 1px solid #444;
+            padding: 10px 12px;
+            margin: 8px 0;
+            background: #1a1a1a;
+            text-align: left;
+        }
+
+        .feat b {
+            color: #e4c158;
+        }
+
+        .feat span {
+            display: block;
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body class="start-page">
+    <div id="start-wrap">
+        <p class="gold">成就加成</p>
+        <p class="hint">勾選會在進遊戲時改星的開局數值。不是永久成就，也還不會存檔。</p>
+        <label class="feat"><input type="checkbox" value="rich" />
+            <div><b>零用錢</b><span>金錢 +200。</span></div>
+        </label>
+        <label class="feat"><input type="checkbox" value="tough" />
+            <div><b>耐打</b><span>體力 90，傷勢 0。</span></div>
+        </label>
+        <label class="feat"><input type="checkbox" value="calm" />
+            <div><b>沉得住</b><span>壓力 10，意志 95。</span></div>
+        </label>
+        <button type="button" id="btn-back">返回標題</button>
+        <button type="button" id="btn-ok" class="start">套用</button>
+    </div>
+    <script src="js/feats.js"></script>
+</body>
+
+</html>
