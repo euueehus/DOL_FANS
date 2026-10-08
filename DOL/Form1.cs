@@ -25,7 +25,9 @@ namespace DOL
 
         private string _characterId = "stelle";
         private string _playerName = "星";
-        private string _portrait = "html_img/cyrene.jpg";
+        private string _servant = "遐蝶";
+        private string _place = "開拓列車站";
+        private string _portrait = "html_img/start.jpg";
         private string _scene = "wake";
         private List<string> _feats = new();
         private int _money = 184;
@@ -33,7 +35,100 @@ namespace DOL
         private int _stress = 30;
         private int _injury = 0;
         private int _will = 88;
+        
 
+        private int _slot;
+        private int _fatigue;
+        private int _minutes = 7 * 60; 
+        private int _day = 1;
+        private static readonly string[] Slots = { "早晨", "上午", "午後", "傍晚", "夜晚", "深夜" };
+        private bool _hasServant;
+        private string _servant = "無";
+
+        private void Spend(int slots, int stamina, int fatigue = 5)
+        {
+            _slot += slots;
+            _stamina -= stamina;
+            _fatigue += fatigue;
+            if (_stamina < 0) _stamina = 0;
+            if (_fatigue > 100) _fatigue = 100;
+            if (_fatigue < 0) _fatigue = 0;
+            if (_slot >= 6)
+            {
+                _slot = 0;
+                _stamina = Math.Min(100, _stamina + 30);
+                _fatigue = Math.Max(0, _fatigue - 20);
+                _stress = Math.Max(0, _stress - 5);
+            }
+        }
+
+        
+        private void Pass(int minutes, int stamina = 0)
+        {
+            if (minutes < 0) minutes = 0;
+            _minutes += minutes;
+            _stamina -= stamina;
+            _fatigue += minutes / 2;
+            if (_stamina < 0) _stamina = 0;
+            if (_fatigue > 100) _fatigue = 100;
+
+            while (_minutes >= 24 * 60)
+            {
+                _minutes -= 24 * 60;
+                _day++;
+                _stamina = Math.Min(100, _stamina + 20);
+                _fatigue = Math.Max(0, _fatigue - 30);
+                _stress = Math.Max(0, _stress - 5);
+            }
+        }
+
+        private string Clock()
+        {
+            return $"{_minutes / 60:00}:{_minutes % 60:00}";
+        }
+
+        private bool Open(int fromHour, int toHour)
+        {
+            int h = _minutes / 60;
+            return h >= fromHour && h < toHour;
+        }
+
+
+        private void ApplyAction(string id)
+        {
+            switch (id)
+            {
+                case "look":
+                    _scene = "mark";
+                    break;
+                case "ask":
+                    _scene = "castorice";
+                    Pass(20, 5);
+                    break;
+                case "station":
+                    _scene = "station";
+                    _place = "開拓列車站";
+                    Pass(30, 8);
+                    break;
+                case "shop":
+                    if (!Open(8, 22)) { _scene = "closed"; break; }
+                    _scene = "shop";
+                    _place = "便利商店";
+                    _money += 40;
+                    Pass(120, 15);
+                    break;
+                case "rest":
+                    _scene = "rest";
+                    _place = "居住區";
+                    _stamina = Math.Min(100, _stamina + 25);
+                    _fatigue = Math.Max(0, _fatigue - 20);
+                    Pass(120, 0);
+                    break;
+                default:
+                    _scene = "wake";
+                    break;
+            }
+        }
         private void Go(string file)
         {
             var path = Path.Combine(AppContext.BaseDirectory, file);
@@ -76,6 +171,12 @@ namespace DOL
                     ApplyCharacter(_characterId);
                     _scene = "wake";
                     Go("ui.html");
+                    break;
+                case "stelle":
+                    _servant = "遐蝶";
+                    _place = "開拓列車站";
+                    _stamina = 60;
+                    _will = 60;
                     break;
 
                 case "start":
@@ -126,16 +227,7 @@ namespace DOL
                     break;
 
                 case "action":
-                    var id = root.GetProperty("id").GetString();
-                    _scene = id switch
-                    {
-                        "window" => "window",
-                        "dress" => "dress",
-                        "bed" => "wake",
-                        "downstairs" => "dress",
-                        "watch" => "watch",
-                        _ => _scene
-                    };
+                    ApplyAction(root.GetProperty("id").GetString() ?? "");
                     await PushStateAsync();
                     break;
             }
@@ -143,25 +235,58 @@ namespace DOL
         //角色數值要增加就加if
         private void ApplyCharacter(string id)
         {
-            if (id == "stelle")
+            _money = 120;
+            _stamina = 60;
+            _stress = 20;
+            _injury = 0;
+            _will = 60;
+            _servant = "搭檔";
+            _place = "居住區";
+
+            switch (id)
             {
-                _money = 184;
-                _stamina = 78;
-                _stress = 30;
-                _injury = 0;
-                _will = 88;
-                _portrait = "html_img/start.jpg";
-                return;
+                case "stelle":
+                    _hasServant = false;
+                    _servant = "無";
+                    _place = "居住區";
+                    _stamina = 60;
+                    _will = 60;
+                    break;
+                case "summon":
+                    _scene = "summoned";
+                    _hasServant = true;
+                    _servant = "遐蝶";
+                    _place = "刻度塔";
+                    Pass(60, 20);
+                    break;
+                case "ask":
+                    if (!_hasServant) { _scene = "noservant"; break; }
+                    _scene = "castorice";
+                    Pass(20, 5);
+                    break;
+                case "march":
+                    _servant = "丹恆"; _place = "開拓列車站";
+                    _stamina = 40; _will = 60; break;
+                case "sensei":
+                    _servant = "白子"; _place = "教室";
+                    _stamina = 40; _will = 80; break;
+                case "hina":
+                    _servant = "星野"; _place = "社團大樓";
+                    _stamina = 80; _will = 60; break;
+                case "trainer":
+                    _servant = "特別周"; _place = "訓練場";
+                    _stamina = 60; _will = 80; break;
+                case "teio":
+                    _servant = "無聲鈴鹿"; _place = "賽道";
+                    _stamina = 80; _will = 40; break;
+                case "herta":
+                    _servant = "銀狼"; _place = "刻度塔";
+                    _stamina = 20; _will = 60; break;
             }
+
             if (_feats.Contains("rich")) _money += 200;
             if (_feats.Contains("tough")) { _stamina = 90; _injury = 0; }
             if (_feats.Contains("calm")) { _stress = 10; _will = 95; }
-
-            _money = 100;
-            _stamina = 70;
-            _stress = 40;
-            _injury = 0;
-            _will = 70;
         }
         private async Task InitWebView()
         {
@@ -190,32 +315,83 @@ namespace DOL
         private async Task PushStateAsync()
         {
             string passage;
-            var actions = Array.Empty<object>();
-            //passage 下包都是劇情文字
-            if (_scene == "wake")
+            object[] actions;
+
+            switch (_scene)
             {
-                passage = "<p>你醒在一間不算熟悉的房間。星核還在，記憶卻對不上這座城。</p>";
-                var list = new List<object>
-    {
-        new { id = "dress", text = "先把自己整理好", cost = "15分" },
-        new { id = "window", text = "看窗外", cost = "" },
-    };
-                if (_characterId == "stelle")
-                    list.Add(new { id = "watch", text = "先觀察，不急著出門", cost = "" });
-                actions = list.ToArray();
-            }
-            else if (_scene == "watch")
-            {
-                passage = "<p>你在門口站了一會。走廊安靜，沒有列車的廣播，也沒有學園的鐘。</p>";
-                actions = new object[]
-                {
-        new { id = "dress", text = "還是去整理裝備", cost = "10分" },
-        new { id = "window", text = "再看一次窗外", cost = "" },
-                };
-            }
-            else
-            {
-                passage = "<p>未完成的場景。</p>";
+                case "mark":
+                    passage = "<p>三道令咒。還沒有英靈來認這三筆。</p>";
+                    actions = new object[]
+                    {
+        new { id = "summon", text = "前往刻度塔召喚", cost = "1小時" },
+                    };
+                    break;
+                case "castorice":
+                    passage = "<p>遐蝶站在你側邊。她確認令咒還有三枚：暫時強化、脫離戰鬥、強制服從一次。</p>";
+                    actions = new object[]
+                    {
+                new { id = "station", text = "去開拓列車站", cost = "1時段" },
+                new { id = "shop", text = "先去便利商店打工", cost = "2時段" },
+                    };
+                    break;
+                case "station":
+                    passage = "<p>開拓列車站沒有列車進站。公告只寫：刻度塔異動，聖杯即將降臨。</p>";
+                    actions = new object[]
+                    {
+                new { id = "shop", text = "去便利商店打工", cost = "2時段" },
+                new { id = "rest", text = "回居住區休息", cost = "2時段" },
+                    };
+                    break;
+                case "shop":
+                    passage = "<p>你在便利商店排完一班。錢進帳，腿是沉的。</p>";
+                    actions = new object[]
+                    {
+                new { id = "rest", text = "回居住區休息", cost = "2時段" },
+                new { id = "station", text = "再去列車站", cost = "1時段" },
+                    };
+                    break;
+                case "rest":
+                    passage = "<p>居住區很安靜。體力回來一點，這一天還沒結束。</p>";
+                    actions = new object[]
+                    {
+                new { id = "station", text = "去開拓列車站", cost = "1時段" },
+                new { id = "look", text = "再看一次令咒", cost = "" },
+                    };
+                    break;
+                case "closed":
+                    passage = "<p>便利商店這時段沒開。公告寫 8:00 到 22:00。</p>";
+                    actions = new object[]
+                    {
+                    new { id = "station", text = "去開拓列車站", cost = "30分" },
+                    new { id = "rest", text = "回居住區", cost = "2小時" },
+                    };
+                    break;
+
+                case "noservant":
+                    passage = "<p>沒有人回應。令咒還在，英靈還沒來。</p>";
+                    actions = new object[]
+                    {
+        new { id = "summon", text = "前往刻度塔召喚", cost = "1小時" },
+                    };
+                    break;
+                case "summoned":
+                    passage = "<p>陣中央站著遐蝶。她看了一眼你的令咒，沒有立刻靠近。</p>";
+                    actions = new object[]
+                    {
+        new { id = "ask", text = "問她令咒能做什麼", cost = "20分" },
+        new { id = "station", text = "帶她去開拓列車站", cost = "30分" },
+                    };
+                    break;
+                default:
+                    passage = "<p>刻度塔亮起。手背浮出三道令咒。身邊還沒有英靈。</p>";
+                    actions = new object[]
+                    {
+        new { id = "look", text = "看手背上的令咒", cost = "" },
+        new { id = "summon", text = "前往刻度塔召喚", cost = "1小時" },
+                    };
+                    break;
+
+        
             }
 
             var state = new
@@ -224,12 +400,13 @@ namespace DOL
                 portrait = _portrait,
                 stats = new Dictionary<string, object>
                 {
-
+                    ["time"] = new { value = Clock(), note = "第 " + _day + " 天", bar = 0 },
+                    ["location"] = new { value = _place, note = _servant, bar = 0 },
                     ["money"] = new { value = "$" + _money, note = "", bar = 0 },
-                    ["stamina"] = new { value = _stamina + " / 100", note = "即興還撐得住", bar = _stamina },
+                    ["stamina"] = new { value = _stamina + " / 100", note = "", bar = _stamina },
                     ["stress"] = new { value = _stress + " / 100", note = "", bar = _stress },
                     ["injury"] = new { value = _injury + " / 100", note = "", bar = _injury },
-                    ["will"] = new { value = _will + " / 100", note = "星核還在", bar = _will },
+                    ["will"] = new { value = _will + " / 100", note = "令咒還在", bar = _will },
                 },
                 passage,
                 actions,
@@ -238,6 +415,7 @@ namespace DOL
             var json = System.Text.Json.JsonSerializer.Serialize(state);
             await webView21.CoreWebView2.ExecuteScriptAsync($"window.setState({json})");
         }
+        
 
         private void button1_Click(object sender, EventArgs e)
         {
