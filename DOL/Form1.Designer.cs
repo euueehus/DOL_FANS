@@ -39,23 +39,19 @@
             webView21.DefaultBackgroundColor = Color.White;
             webView21.Dock = DockStyle.Fill;
             webView21.Location = new Point(0, 0);
-            webView21.Margin = new Padding(2, 2, 2, 2);
             webView21.Name = "webView21";
-            webView21.Size = new Size(1412, 635);
+            webView21.Size = new Size(1924, 974);
             webView21.TabIndex = 0;
             webView21.ZoomFactor = 1D;
-           
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(11F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1412, 635);
+            ClientSize = new Size(1924, 974);
             Controls.Add(webView21);
-            Margin = new Padding(2, 2, 2, 2);
             Name = "Form1";
             Text = "DOL";
-            
             ((System.ComponentModel.ISupportInitialize)webView21).EndInit();
             ResumeLayout(false);
         }
@@ -64,5 +60,6 @@
 
         private Microsoft.Web.WebView2.WinForms.WebView2 webView21;
         private Button button1;
+        private CheckBox checkBox1;
     }
 }

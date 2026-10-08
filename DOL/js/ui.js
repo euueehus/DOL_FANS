@@ -37,16 +37,28 @@
         });
     }
 
+    var panels = {};
+    var panelTitles = { journal: "日誌", skills: "角色" };
+
+    function replay(el) {
+        el.classList.remove("fade");
+        void el.offsetWidth;
+        el.classList.add("fade");
+    }
+
+    function openPanel(name) {
+        document.getElementById("dialog-title").textContent = panelTitles[name] || "";
+        document.getElementById("dialog-body").innerHTML = panels[name] || "<p class=\"muted\">（還沒有內容）</p>";
+        document.getElementById("dialog").hidden = false;
+        applyBars();
+    }
+
+    function closePanel() {
+        document.getElementById("dialog").hidden = true;
+    }
+
     window.setState = function (s) {
         function setStat(id, value, note, bar) {
-            if (s.portrait) {
-                var img = document.getElementById("portrait");
-                if (img) img.src = s.portrait;
-                if (s.portrait) {
-                    var img = document.getElementById("portrait");
-                    if (img) img.src = s.portrait;
-                }
-            }
             var el = document.getElementById(id);
 
             if (!el) return;
@@ -57,6 +69,12 @@
             if (note !== undefined && noteEl) noteEl.textContent = note;
             if (bar !== undefined && barEl) barEl.setAttribute("data-value", bar);
         }
+
+        if (s.portrait) {
+            var img = document.getElementById("portrait");
+            if (img) img.src = s.portrait;
+        }
+        if (s.panels) panels = s.panels;
 
         if (s.playerName) {
             document.getElementById("player-name").textContent = s.playerName;
@@ -69,10 +87,12 @@
         }
         if (s.passage) {
             document.getElementById("passage-text").innerHTML = s.passage;
+            replay(document.getElementById("passage-text"));
         }
         if (s.actions) {
             var ul = document.getElementById("action-list");
             ul.innerHTML = "";
+            replay(ul);
             s.actions.forEach(function (a) {
                 var li = document.createElement("li");
                 var link = document.createElement("a");
@@ -114,6 +134,20 @@
 
     document.getElementById("ui-bar-toggle").addEventListener("click", function () {
         document.getElementById("ui-bar").classList.toggle("stowed");
+    });
+
+    document.getElementById("ui-bar").addEventListener("click", function (e) {
+        var b = e.target.closest("[data-panel]");
+        if (!b) return;
+        e.preventDefault();
+        openPanel(b.getAttribute("data-panel"));
+    });
+    document.getElementById("dialog-close").addEventListener("click", closePanel);
+    document.getElementById("dialog").addEventListener("click", function (e) {
+        if (e.target.id === "dialog") closePanel();
+    });
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closePanel();
     });
 
     applyBars();

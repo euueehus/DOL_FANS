@@ -92,6 +92,8 @@
 
             <nav id="menu">
                 <ul>
+                    <li><a href="#" data-panel="journal">日誌</a></li>
+                    <li><a href="#" data-panel="skills">角色</a></li>
                     <li><a href="#" data-cmd="save">存檔</a></li>
                     <li><a href="#" data-cmd="load">讀檔</a></li>
                     <li><a href="#" data-cmd="settings">設定</a></li>
@@ -107,6 +109,14 @@
                 <p>等待遊戲狀態…</p>
             </div>
             <ul id="action-list"></ul>
+        </div>
+    </div>
+
+    <div id="dialog" hidden>
+        <div id="dialog-box" role="dialog" aria-modal="true">
+            <button type="button" id="dialog-close" aria-label="關閉">×</button>
+            <div id="dialog-title"></div>
+            <div id="dialog-body"></div>
         </div>
     </div>
 
