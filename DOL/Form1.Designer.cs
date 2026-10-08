@@ -44,7 +44,7 @@
             webView21.Size = new Size(1412, 635);
             webView21.TabIndex = 0;
             webView21.ZoomFactor = 1D;
-            webView21.Click += webView21_Click;
+           
             // 
             // Form1
             // 
@@ -55,7 +55,7 @@
             Margin = new Padding(2, 2, 2, 2);
             Name = "Form1";
             Text = "DOL";
-            Load += Form1_Load;
+            
             ((System.ComponentModel.ISupportInitialize)webView21).EndInit();
             ResumeLayout(false);
         }
