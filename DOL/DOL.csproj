@@ -39,31 +39,8 @@
     <None Update="html_img\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Compile Update="Game.Arcs.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Game.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Game.Daily.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Game.End.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Game.Intro.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Game.Main.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="GameState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="Story.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <None Update="feats.html"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
+<None Update="load.html"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
 <None Update="settings.html"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
 <None Update="css\create.css"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
 <None Update="js\feats.js"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>讀取存檔</title>
+    <link rel="stylesheet" href="css/start.css" />
+    <style>
+        .slot {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            padding: 10px 12px;
+            margin: 8px 0;
+            text-align: left;
+        }
+
+        .slot .info { flex: 1; min-width: 0; }
+        .slot b { color: #e4c158; font-weight: normal; margin-right: 8px; }
+        .slot .sub { font-size: 13px; color: #aaa; margin-top: 2px; }
+        .slot button { padding: 6px 14px; }
+        .slot button.armed { border-color: #ec3535; color: #ec3535; }
+        .slot button:disabled { opacity: 0.35; cursor: default; }
+        #toast {
+            position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+            background: #222; border: 1px solid #e4c158; padding: 6px 18px;
+            opacity: 0; transition: opacity 200ms; pointer-events: none;
+        }
+        #toast.show { opacity: 1; }
+    </style>
+</head>
+
+<body class="start-page">
+    <div id="start-wrap">
+        <p class="gold">讀取存檔</p>
+        <p class="hint">存檔放在這台電腦的 AppData\DOL\saves。欄位 0 是睡覺時的自動存檔。</p>
+        <div id="slots"></div>
+        <button type="button" id="btn-back">返回標題</button>
+    </div>
+    <div id="toast"></div>
+    <script>
+        function send(msg) {
+            if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage(msg);
+        }
+        document.getElementById("btn-back").addEventListener("click", function () {
+            send({ type: "nav", page: "start" });
+        });
+        var timer = 0;
+        window.toast = function (text) {
+            var t = document.getElementById("toast");
+            t.textContent = text;
+            t.classList.add("show");
+            clearTimeout(timer);
+            timer = setTimeout(function () { t.classList.remove("show"); }, 1800);
+        };
+        window.showSlots = function (data) {
+            var box = document.getElementById("slots");
+            box.innerHTML = "";
+            data.slots.forEach(function (s) {
+                var row = document.createElement("div");
+                row.className = "slot";
+                var info = document.createElement("div");
+                info.className = "info";
+                var t = document.createElement("div");
+                var b = document.createElement("b");
+                b.textContent = s.slot === 0 ? "自動" : "欄位 " + s.slot;
+                t.appendChild(b);
+                t.appendChild(document.createTextNode(s.empty ? (s.slot === 0 ? "（還沒有自動存檔）" : "（空）") : s.name));
+                info.appendChild(t);
+                if (!s.empty) {
+                    var sub = document.createElement("div");
+                    sub.className = "sub";
+                    sub.textContent = s.summary + "　" + s.savedAt;
+                    info.appendChild(sub);
+                }
+                row.appendChild(info);
+
+                var load = document.createElement("button");
+                load.type = "button";
+                load.textContent = "讀取";
+                load.disabled = s.empty;
+                load.addEventListener("click", function () { send({ type: "slotLoad", slot: s.slot }); });
+                row.appendChild(load);
+
+                if (!s.empty && s.slot !== 0) {
+                    var del = document.createElement("button");
+                    del.type = "button";
+                    del.textContent = "刪除";
+                    del.addEventListener("click", function () {
+                        if (del.getAttribute("data-armed") === "1") {
+                            send({ type: "slotDelete", slot: s.slot, mode: "load" });
+                            return;
+                        }
+                        del.setAttribute("data-armed", "1");
+                        del.classList.add("armed");
+                        del.textContent = "確定刪除？";
+                        setTimeout(function () {
+                            if (!del.isConnected) return;
+                            del.removeAttribute("data-armed");
+                            del.classList.remove("armed");
+                            del.textContent = "刪除";
+                        }, 2500);
+                    });
+                    row.appendChild(del);
+                }
+                box.appendChild(row);
+            });
+        };
+    </script>
+</body>
+
+</html>

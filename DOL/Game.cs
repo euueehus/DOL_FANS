@@ -64,6 +64,7 @@ namespace DOL
         public static object Panels(GameState g)
         {
             var j = new StringBuilder();
+            j.Append($"<p class=\"muted\">難度：{(g.Difficulty == "easy" ? "簡單" : g.Difficulty == "hard" ? "困難" : "普通")}</p>");
             j.Append("<h3 class=\"gold\">目標</h3>");
             int ch = DueChapter(g);
             j.Append(ch > 0

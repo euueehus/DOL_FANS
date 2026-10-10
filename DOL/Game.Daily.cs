@@ -47,8 +47,8 @@ namespace DOL
         {
             if (g.Money >= 30) c.Add(new("snack", "買個飯糰", "$30"));
             if (g.Money >= 50) c.Add(new("buy_bandage", "買繃帶", "$50"));
-            if (g.ShopOpen && g.Stamina >= 6) c.Add(new("shop", "再打一班", "2小時"));
-            c.Add(new("home", "回居住區", "30分"));
+            if (g.ShopOpen && g.Stamina >= 6) c.Add(new("shop", "打一班", "2小時"));
+            c.Add(new("home", "回居住區", TravelLabel(g, "home")));
         }
 
         private static bool RenderDaily(GameState g, List<Choice> c, out string p)
@@ -66,13 +66,6 @@ namespace DOL
                         if (g.Injury >= 50) sb.Append("<p class=\"red\">傷得不輕，別做太激烈的事。</p>");
                         p = sb.ToString();
                         if (ch > 0) c.Add(new("ch" + ch, $"前往刻度塔（第 {ch} 章）", "30分"));
-                        if (g.Stamina >= 3)
-                        {
-                            c.Add(new("go_trail", "去開拓列車站", "30分"));
-                            c.Add(new("go_school", "去學園都市", "30分"));
-                            c.Add(new("go_track", "去賽場", "30分"));
-                        }
-                        if (g.ShopOpen && g.Stamina >= 6) c.Add(new("shop", "去便利商店打工", "2小時"));
                         if (g.HasServant && !g.Has($"med:{g.Day}")) c.Add(new("meditate", "請遐蝶指點魔力", "1小時"));
                         if (g.HasServant && !g.Has($"cast:{g.Day}")) c.Add(new("cast_talk", "跟遐蝶聊聊", "30分"));
                         if (g.Items["bandage"] > 0 && g.Injury > 0) c.Add(new("bandage", "用繃帶處理傷口"));
@@ -99,6 +92,9 @@ namespace DOL
                     p = $"<p>手背一陣熱，疲倦被什麼壓了下去。遐蝶看了一眼剩下的紋路，什麼也沒說。還剩 {g.Seals} 道。</p>";
                     c.Add(new("home", "收回")); return true;
 
+                case "loc_shop":
+                    p = "<p>便利商店的自動門每隔幾分鐘就叮咚一聲。店長在櫃檯後面對帳，抬頭看了你一眼，又低下去。</p>";
+                    ShopChoices(g, c); return true;
                 case "shop":
                     p = "<p>便利商店的班結束了。店長把今天的錢塞給你，順口問你要不要微波一個飯糰。</p>";
                     ShopChoices(g, c); return true;
@@ -111,20 +107,15 @@ namespace DOL
                     ShopChoices(g, c); return true;
                 case "snack":
                     p = "<p>熱的飯糰，海苔有點軟，還是比什麼都有用。</p>";
-                    c.Add(new("shop", "再看看")); c.Add(new("home", "回居住區", "30分")); return true;
+                    c.Add(new("loc_shop", "再看看")); c.Add(new("home", "回居住區", TravelLabel(g, "home"))); return true;
                 case "bought":
                     p = "<p>你把繃帶塞進外套口袋。</p>";
-                    c.Add(new("shop", "再看看")); c.Add(new("home", "回居住區", "30分")); return true;
+                    c.Add(new("loc_shop", "再看看")); c.Add(new("home", "回居住區", TravelLabel(g, "home"))); return true;
                 case "closed":
                     p = "<p>鐵門拉下來了，營業時間是 8 點到 22 點。</p>";
                     c.Add(new("home", "回居住區")); return true;
 
-                case "cast_1":
-                case "cast_2":
-                case "cast_3":
-                case "cast_4":
-                case "cast_5":
-                case "cast_6":
+                case "cast_1": case "cast_2": case "cast_3": case "cast_4": case "cast_5": case "cast_6":
                     p = CastTalk[int.Parse(g.Scene[5..]) - 1];
                     c.Add(new("home", "各自去忙")); return true;
 
@@ -134,12 +125,15 @@ namespace DOL
                 case "loc_track":
                     {
                         string k = g.Scene[4..];
+                        bool here = Present(g, k);
                         p = k switch
                         {
                             "trail" => "<p>列車停在側線上，車窗都亮著燈。帕姆在月台那頭整理行李，看見你點了個頭，又低頭繼續數箱子。</p>",
-                            "school" => "<p>社團大樓有一半的燈亮著，門口的告示欄貼滿學園祭的海報，邊角被風吹得翹起來。</p>",
-                            _ => g.Raining
-                                ? "<p>下雨，跑道封了。看台上空空的，只有幾個人躲在棚子底下滑手機。</p>"
+                            "school" => here
+                                ? "<p>社團大樓有一半的燈亮著，門口的告示欄貼滿學園祭的海報，邊角被風吹得翹起來。</p>"
+                                : "<p>社團大樓的燈都關了，風紀委員會的門上貼著紙條：開放時間 8:00 到 20:00。</p>",
+                            _ => !here ? "<p>跑道上沒有人，管理室的燈關著。</p>"
+                                : g.Raining ? "<p>下雨，跑道封了。看台上空空的，只有幾個人躲在棚子底下滑手機。</p>"
                                 : "<p>跑道上有人在熱身，鞋底刮過地面的聲音一陣一陣傳過來。</p>",
                         };
                         if (k == "trail" && !g.Has("met"))
@@ -149,22 +143,22 @@ namespace DOL
                         }
                         else
                         {
-                            if (!g.Has($"talk:{k}:{g.Day}"))
+                            if (here && !g.Has($"talk:{k}:{g.Day}"))
                                 c.Add(new("talk_" + k, $"找{GameState.FactionName[k]}的人聊聊", "1小時"));
-                            ArcChoices(g, k, c);
+                            if (here) ArcChoices(g, k, c);
                             if (k == "trail" && g.Stamina >= 5) c.Add(new("work_trail", "幫列車組跑腿", "1小時"));
-                            if (k == "school")
+                            if (k == "school" && here)
                             {
                                 if (g.Stamina >= 5) c.Add(new("work_school", "幫風紀委員會整理資料", "2小時"));
                                 if (!g.Has($"study:{g.Day}") && g.Stamina >= 5) c.Add(new("study_school", "到圖書館查塔的記錄", "90分"));
                             }
-                            if (k == "track" && !g.Raining)
+                            if (k == "track" && here && !g.Raining)
                             {
                                 if (g.Stamina >= 10) c.Add(new("work_track", "維護跑道、搬器材", "2小時"));
                                 if (!g.Has($"train:{g.Day}") && g.Stamina >= 10 && g.Injury < 50) c.Add(new("train_track", "在跑道上訓練", "1小時"));
                             }
                         }
-                        c.Add(new("home", "回居住區", "30分"));
+                        c.Add(new("home", "回居住區", TravelLabel(g, "home")));
                     }
                     return true;
                 case "talk_trail":
@@ -174,7 +168,7 @@ namespace DOL
                         string k = g.Scene[5..];
                         p = $"<p>{Talk[k][Math.Clamp(g.Talks[k] - 1, 0, 4)]}</p>";
                         c.Add(new("loc_" + k, "留在這裡"));
-                        c.Add(new("home", "回居住區", "30分"));
+                        c.Add(new("home", "回居住區", TravelLabel(g, "home")));
                     }
                     return true;
                 case "worked":
@@ -185,7 +179,7 @@ namespace DOL
                         _ => "<p>搬了兩個小時的跨欄和水桶，肩膀痠得抬不起來。管理員拍拍你說：「明天還有。」你沒接話。</p>",
                     };
                     c.Add(new("loc_" + g.Last, "回到據點"));
-                    c.Add(new("home", "回居住區", "30分"));
+                    c.Add(new("home", "回居住區", TravelLabel(g, "home")));
                     return true;
                 case "studied":
                     p = "<p>圖書館角落那一疊舊記錄，大半是塔的維修單，字跡潦草。翻到一半有幾頁寫到六個刻度各自管什麼，邊上還有人用鉛筆加了註記，註記的人大概自己也不太確定。</p>";
@@ -256,9 +250,11 @@ namespace DOL
 
         private static void Go(GameState g, string k, string place)
         {
+            if (g.Place == place) { g.Scene = "loc_" + k; return; }
+            int m = TravelMinutes(g.Place, k);
             g.Scene = "loc_" + k;
             g.Place = place;
-            g.Pass(30, g.Raining ? 4 : 2);
+            g.Pass(m, TravelStamina(g, m));
             MaybeEvent(g, "loc_" + k);
         }
 
@@ -267,7 +263,12 @@ namespace DOL
             switch (id)
             {
                 case "home":
-                    if (g.Place != "居住區") g.Pass(30, g.Raining ? 2 : 1);
+                case "go_home":
+                    if (g.Place != "居住區")
+                    {
+                        if (g.Place is "學園祭廣場" or "賽道" or "刻度塔") g.Pass(30, g.Raining ? 2 : 1);
+                        else { int m = TravelMinutes(g.Place, "home"); g.Pass(m, TravelStamina(g, m)); }
+                    }
                     g.Place = "居住區"; g.Scene = "home"; return true;
                 case "wait": g.Rest(60); g.Scene = "home"; return true;
                 case "rest": g.Rest(120); g.Place = "居住區"; g.Scene = "rested"; return true;
@@ -310,10 +311,15 @@ namespace DOL
                 case "go_trail": Go(g, "trail", "開拓列車站"); return true;
                 case "go_school": Go(g, "school", "學園都市"); return true;
                 case "go_track": Go(g, "track", "賽場"); return true;
-                case "loc_trail": case "loc_school": case "loc_track": g.Scene = id; return true;
-                case "talk_trail":
-                case "talk_school":
-                case "talk_track":
+                case "go_shop": Go(g, "shop", "便利商店"); return true;
+                case "go_tower":
+                    {
+                        int n = DueChapter(g);
+                        if (n > 0) return StepMain(g, "ch" + n);
+                    }
+                    return true;
+                case "loc_trail": case "loc_school": case "loc_track": case "loc_shop": g.Scene = id; return true;
+                case "talk_trail": case "talk_school": case "talk_track":
                     {
                         string k = id[5..];
                         g.Flags.Add($"talk:{k}:{g.Day}");

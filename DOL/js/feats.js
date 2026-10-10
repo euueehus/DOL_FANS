@@ -10,4 +10,9 @@
         document.querySelectorAll(".feat input:checked").forEach(function (el) { ids.push(el.value); });
         send({ type: "feats", ids: ids });
     });
+    window.setFeats = function (ids) {
+        document.querySelectorAll(".feat input").forEach(function (el) {
+            el.checked = ids.indexOf(el.value) >= 0;
+        });
+    };
 })();

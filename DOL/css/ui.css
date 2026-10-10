@@ -410,16 +410,128 @@ a:hover {
 }
 
 @keyframes fadein {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 #passage-text.fade,
 #action-list.fade {
     animation: fadein 220ms ease-in;
 }
+
+/* ── 設定變數：由設定視窗調整 ── */
+#passages { max-width: var(--pw, 42em); }
+#passage-text { font-size: calc(1.05em * var(--fs, 1)); }
+#action-list a { font-size: calc(1.02em * var(--fs, 1)); }
+body.no-fade #passage-text.fade,
+body.no-fade #action-list.fade { animation: none; }
+body.hide-cost .cost { display: none; }
+
+/* ── 地圖 ── */
+#dialog-box.wide { width: min(46em, 96%); }
+
+.maplink {
+    display: inline-block;
+    margin-top: 0.15em;
+    font-size: 0.8em;
+}
+
+.map-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: var(--900);
+    border: 1px solid var(--750);
+}
+
+.map-road {
+    stroke: var(--700);
+    stroke-width: 2;
+    stroke-dasharray: 6 5;
+}
+
+.map-node rect {
+    fill: var(--850);
+    stroke: var(--600);
+    stroke-width: 1.5;
+}
+
+.map-node text {
+    fill: var(--000);
+    text-anchor: middle;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.map-node .sub { font-size: 11.5px; fill: var(--300); }
+.map-node .who { font-size: 11px; fill: var(--400); paint-order: stroke; stroke: var(--900); stroke-width: 4px; stroke-linejoin: round; }
+
+.map-node.here rect { stroke: var(--gold); stroke-width: 2.5; }
+.map-node.here .sub { fill: var(--gold); }
+
+.map-node.ok { cursor: pointer; }
+.map-node.ok rect { stroke: var(--lblue); }
+.map-node.ok:hover rect { fill: var(--750); stroke: var(--000); }
+
+.map-node.locked { opacity: 0.45; }
+
+/* ── 存檔／設定列 ── */
+.slot {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0.5em 0;
+    border-top: 1px solid var(--750);
+}
+
+.slot:first-of-type { border-top: none; }
+.slot .info { flex: 1; min-width: 0; }
+.slot .info b { color: var(--gold); font-weight: normal; margin-right: 0.4em; }
+.slot .info div { font-size: 0.82em; color: var(--400); }
+
+.btn {
+    background: var(--800);
+    color: var(--000);
+    border: 1px solid var(--600);
+    padding: 0.25em 0.8em;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9em;
+}
+
+.btn:hover { border-color: var(--000); }
+.btn:disabled { opacity: 0.35; cursor: default; border-color: var(--600); }
+.btn.armed { border-color: var(--red); color: var(--red); }
+.btn.on { border-color: var(--gold); color: var(--gold); }
+
+.optrow { margin: 0.9em 0; }
+.optrow > span { display: block; margin-bottom: 0.35em; color: var(--150); }
+.optrow .btn { margin-right: 0.4em; }
+
+#save-name-input {
+    width: 100%;
+    background: var(--900);
+    color: var(--000);
+    border: 1px solid var(--600);
+    padding: 0.35em 0.5em;
+    margin: 0.3em 0 0.8em;
+    font: inherit;
+}
+
+#toast {
+    position: fixed;
+    left: 50%;
+    bottom: 2em;
+    transform: translateX(-50%);
+    z-index: 200;
+    background: var(--850);
+    border: 1px solid var(--gold);
+    color: var(--000);
+    padding: 0.45em 1.2em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms;
+    font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+}
+
+#toast.show { opacity: 1; }

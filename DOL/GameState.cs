@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DOL
 {
     // ───────── 遊戲狀態 ─────────
@@ -13,7 +15,7 @@ namespace DOL
         private static readonly string[] WeatherTable = { "晴", "晴", "陰", "雨", "晴", "陰", "雨" };
 
         public int Day = 1, Minutes = 7 * 60, Money = 120, Stamina = 85, Fatigue, Stress = 20, Injury, Will = 60, Seals, Bond;
-        public string Scene = "wake", Place = "居住區", Servant = "無", Next = "home", Last = "";
+        public string Scene = "wake", Place = "居住區", Servant = "無", Next = "home", Last = "", Difficulty = "normal";
         public bool HasServant;
         public HashSet<string> Flags = new();
         // 好感（0~5）：開拓是星自己人，起點就是 2
@@ -22,15 +24,15 @@ namespace DOL
         public Dictionary<string, int> Skill = new() { ["fit"] = 0, ["social"] = 0, ["magic"] = 0, ["insight"] = 0 };
         public Dictionary<string, int> Items = new() { ["bandage"] = 0 };
         public Dictionary<string, int> Count = new() { ["shop"] = 0, ["cast"] = 0 };
-        public List<(string Cls, string Text)> Notes = new();
-        public Random Rng = new();
+        [JsonIgnore] public List<(string Cls, string Text)> Notes = new();
+        [JsonIgnore] public Random Rng = new();
 
-        public string Clock => $"{Minutes / 60:00}:{Minutes % 60:00}";
-        public int Hour => Minutes / 60;
-        public bool ShopOpen => Hour >= 8 && Hour < 22;
-        public string Weekday => Weekdays[(Day - 1) % 7];
-        public string Weather => WeatherTable[(Day * 3 + 1) % 7];
-        public bool Raining => Weather == "雨";
+        [JsonIgnore] public string Clock => $"{Minutes / 60:00}:{Minutes % 60:00}";
+        [JsonIgnore] public int Hour => Minutes / 60;
+        [JsonIgnore] public bool ShopOpen => Hour >= 8 && Hour < 22;
+        [JsonIgnore] public string Weekday => Weekdays[(Day - 1) % 7];
+        [JsonIgnore] public string Weather => WeatherTable[(Day * 3 + 1) % 7];
+        [JsonIgnore] public bool Raining => Weather == "雨";
         public bool Has(string f) => Flags.Contains(f);
 
         public void Note(string cls, string text) => Notes.Add((cls, text));
@@ -51,7 +53,15 @@ namespace DOL
             Skill[s] = Math.Min(100, Skill[s] + n);
             Note("green", $"{SkillName[s]} +{n}");
         }
-        public void Earn(int m) { Money += m; Note("green", $"金錢 +${m}"); }
+        [JsonIgnore] private double CostMul => Difficulty == "easy" ? 0.6 : Difficulty == "hard" ? 1.4 : 1.0;
+        [JsonIgnore] private double PayMul => Difficulty == "easy" ? 1.3 : Difficulty == "hard" ? 0.8 : 1.0;
+
+        public void Earn(int m)
+        {
+            int amt = Math.Max(1, (int)Math.Round(m * PayMul));
+            Money += amt;
+            Note("green", $"金錢 +${amt}");
+        }
         public void Hurt(int n) { Injury = Math.Min(100, Injury + n); Note("red", $"傷勢 +{n}"); }
         public void Strain(int n) { Stress = Math.Min(100, Stress + n); Note("red", $"壓力 +{n}"); }
         public void Calm(int n) { Stress = Math.Max(0, Stress - n); Note("green", $"壓力 -{n}"); }
@@ -74,7 +84,8 @@ namespace DOL
         public void Pass(int minutes, int stamina = 0)
         {
             minutes = Math.Max(0, minutes);
-            Stamina = Math.Max(0, Stamina - stamina);
+            int cost = stamina <= 0 ? 0 : Math.Max(1, (int)Math.Round(stamina * CostMul));
+            Stamina = Math.Max(0, Stamina - cost);
             Stamina = Math.Min(100, Stamina + minutes / 30);
             Fatigue = Math.Min(100, Fatigue + minutes / 8);
             Advance(minutes);
@@ -95,10 +106,30 @@ namespace DOL
             Injury = Math.Max(0, Injury - 5);
         }
 
-        public void Reset(string characterId, IEnumerable<string> feats)
+
+        /// <summary>讀檔後補齊舊存檔缺的欄位，避免之後新增內容時讀到 null 或缺 key。</summary>
+        public void Normalize()
+        {
+            Flags ??= new();
+            Rel ??= new(); Talks ??= new(); Skill ??= new(); Items ??= new(); Count ??= new();
+            foreach (var k in new[] { "trail", "school", "track" })
+            {
+                if (!Rel.ContainsKey(k)) Rel[k] = 0;
+                if (!Talks.ContainsKey(k)) Talks[k] = 0;
+            }
+            foreach (var k in new[] { "fit", "social", "magic", "insight" }) if (!Skill.ContainsKey(k)) Skill[k] = 0;
+            if (!Items.ContainsKey("bandage")) Items["bandage"] = 0;
+            foreach (var k in new[] { "shop", "cast" }) if (!Count.ContainsKey(k)) Count[k] = 0;
+            if (string.IsNullOrEmpty(Difficulty)) Difficulty = "normal";
+            Notes = new();
+            Rng = new();
+        }
+
+        public void Reset(string characterId, IEnumerable<string> feats, string difficulty = "normal")
         {
             var f = feats.ToList();
-            Day = 1; Minutes = 7 * 60; Money = 120; Fatigue = 0; Stress = 20;
+            Difficulty = difficulty is "easy" or "hard" ? difficulty : "normal";
+            Day = 1; Minutes = 7 * 60; Money = Difficulty == "easy" ? 220 : Difficulty == "hard" ? 80 : 120; Fatigue = 0; Stress = 20;
             Injury = 0; Seals = 0; Bond = 0;
             Scene = "wake"; Place = "居住區"; Servant = "無"; Next = "home"; Last = "";
             HasServant = false;

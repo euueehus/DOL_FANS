@@ -27,6 +27,7 @@
         <div class="row menus">
 
             <button type="button" data-cmd="feats">成就加成 <span class="star">*</span></button>
+            <button type="button" data-cmd="load">讀取存檔</button>
             <button type="button" data-cmd="gallery">畫廊</button>
             <button type="button" data-cmd="io">導出/導入設置</button>
         </div>
@@ -36,9 +37,20 @@
             <span class="teal">推薦初學者選擇。</span>
         </div>
 
+        <div id="custom-box" class="help" hidden>
+            <span class="gold">難度：</span>
+            <select id="difficulty">
+                <option value="easy">簡單　體力消耗少、收入多、起始金錢多</option>
+                <option value="normal" selected>普通</option>
+                <option value="hard">困難　體力消耗多、收入少、起始金錢少</option>
+            </select>
+        </div>
+
+        <p id="picked" class="teal"></p>
+
         <p class="gold">存檔名：<span class="muted">（可選）</span></p>
-        <input id="save-name" type="text" maxlength="40" />
-        <p class="hint">存檔之後才會真正寫入。現在先不用填。</p>
+        <input id="save-name" type="text" maxlength="24" />
+        <p class="hint">存檔時會用這個名字當預設，沒填就用角色名和天數。</p>
 
         <p class="gold">當前設置：<span class="muted">可調整</span></p>
         <button type="button" id="btn-start" class="start">(1) 開始遊戲！</button>

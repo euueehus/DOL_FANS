@@ -72,13 +72,8 @@ namespace DOL
             switch (id)
             {
                 case "end_d": g.Scene = TrueEnding(g) ? "end_d" : "ch5"; return true;
-                case "end_a":
-                case "end_b":
-                case "end_c":
-                case "end_a2":
-                case "end_b2":
-                case "end_c2":
-                case "end_d2":
+                case "end_a": case "end_b": case "end_c":
+                case "end_a2": case "end_b2": case "end_c2": case "end_d2":
                     g.Scene = id; return true;
             }
             return false;
